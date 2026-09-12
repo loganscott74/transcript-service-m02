@@ -43,3 +43,51 @@ describe('getTranscript', () => {
     expect(() => db.getTranscript(1)).toThrowError();
   });
 });
+
+describe('addGrade', () => {
+  it('given a valid student ID, course, and grade, should add the grade to the student transcript', () => {
+    const id1 = db.addStudent('blair');
+    db.addGrade(id1, 'CS4530', { course: 'CS4530', grade: 90 });
+    expect(db.getGrade(id1, 'CS4530')).toEqual(90);
+  });
+
+  it('given a valid student ID, course, and grade, should add the grade to the student transcript when other grades are present', () => {
+    const id1 = db.addStudent('blair');
+    db.addGrade(id1, 'CS4530', { course: 'CS4530', grade: 90 });
+    db.addGrade(id1, 'CS4531', { course: 'CS4531', grade: 85 });
+    expect(db.getGrade(id1, 'CS4530')).toEqual(90);
+    expect(db.getGrade(id1, 'CS4531')).toEqual(85);
+  });
+
+  it('given two valid student ID, a course, and a grade, should add the grade to only the one student transcript', () => {
+    const id1 = db.addStudent('blair');
+    const id2 = db.addStudent('corey');
+    db.addGrade(id1, 'CS4530', { course: 'CS4530', grade: 90 });
+    expect(db.getGrade(id1, 'CS4530')).toEqual(90);
+    expect(db.getGrade(id2, 'CS4530')).toBeUndefined();
+  });
+
+  it('given a valid student ID, a valid course, and a missmatching grade, should not add the grade to the student transcript', () => {
+    const id1 = db.addStudent('blair');
+    // Throw since the course in the grade object does not match the course parameter
+    expect(db.addGrade(id1, 'CS4530', { course: 'CS5000', grade: 90 })).toThrowError();
+    expect(db.getGrade(id1, 'CS5000')).toBeUndefined();
+    expect(db.getGrade(id1, 'CS4530')).toBeUndefined();
+  });
+
+  it('given a valid student ID, an invalid course, and a invalid grade, should not add the grade to the student transcript', () => {
+    const id1 = db.addStudent('blair');
+    // Throw since course is empty
+    expect(db.addGrade(id1, '', { course: '', grade: 90 })).toThrowError();
+    expect(db.getGrade(id1, '')).toBeUndefined();
+  });
+
+  it('given two valid student ID, courses, and grades, should add the grades to only the respective student transcript', () => {
+    const id1 = db.addStudent('blair');
+    const id2 = db.addStudent('blair');
+    db.addGrade(id1, 'CS4530', { course: 'CS4530', grade: 90 });
+    db.addGrade(id2, 'CS4530', { course: 'CS4530', grade: 85 });
+    expect(db.getGrade(id1, 'CS4530')).toEqual(90);
+    expect(db.getGrade(id2, 'CS4530')).toEqual(85);
+  });
+});

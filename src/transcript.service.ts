@@ -33,6 +33,7 @@ export class TranscriptDB implements TranscriptService {
    * @returns {StudentID} - the newly-assigned ID for the new student
    */
   addStudent(newName: string): StudentID {
+    // FIX: Instead of ++ which also modifies _lastID, should use _lastID + 1 which does not modify _lastID
     const newID = this._lastID++;
     const newStudent: Student = { studentID: newID, studentName: newName };
     this._transcripts.push({ student: newStudent, grades: [] });
